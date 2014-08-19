@@ -1,0 +1,11 @@
+from idaapi import *
+from idautils import *
+
+import subprocess
+import time
+
+if __name__ == '__main__':
+    autoWait()
+    subprocess.Popen([r"***AUTOIT_PATH***", r"***AUTOIT_SCRIPT***"])
+    plugin = load_plugin(r"***BINDIFF_PLUGIN***")
+    print run_plugin(plugin, 0)

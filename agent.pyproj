@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{cd435f2f-4ff1-4336-9b1a-f8669596c4dc}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>agent.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>agent</Name>
+    <RootNamespace>agent</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="agent.py" />
+    <Compile Include="config.py" />
+    <Compile Include="IDAScripts\exit.py" />
+    <Compile Include="IDAScripts\idbsave.template" />
+    <Compile Include="IDAScripts\run_binDiff.template">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Lib\bindiffer.py" />
+    <Compile Include="Lib\pairFinder.py" />
+    <Compile Include="Lib\unpacker.py" />
+    <Compile Include="Lib\utils.py" />
+    <Compile Include="Lib\__init__.py" />
+    <Compile Include="logger.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Modules\any.py" />
+    <Compile Include="Modules\flash.py" />
+    <Compile Include="Modules\module.py" />
+    <Compile Include="Modules\__init__.py" />
+    <Compile Include="test.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Modules\" />
+    <Folder Include="Lib\" />
+    <Folder Include="IDAScripts\" />
+    <Folder Include="Au3\" />
+    <Folder Include="bin\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Au3\bindiffer_template.au3">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+</Project>

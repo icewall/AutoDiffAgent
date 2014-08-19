@@ -1,0 +1,13 @@
+import sys
+
+from idaapi import *
+from idautils import *
+import idc
+
+output = r'***OUT***'
+
+if __name__ == '__main__':
+    autoWait()
+    save_database(output, False)
+    
+    Exit(0)
