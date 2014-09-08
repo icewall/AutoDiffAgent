@@ -1,12 +1,2 @@
-Config.py
-----------
-
-Before launching agent , configure properly config.py file.
-
-
-
-General settings
-------------------
-[+]Win7 configuration
-	If agent is installed on Win7, UAC should be disabled, because for some package types during extraction UAC
-	window will popup.
+[*] Agent privilages on Windows 7 
+Agent to work correctly when he is runned on Win7 u need to execute him with High privilages or just turn off UAC.

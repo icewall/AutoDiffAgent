@@ -5,6 +5,9 @@ import os
 from config import Config
 
 class CAny(Thread,Module):
+    def __init__(self):
+        Thread.__init__(self)
+        Module.__init__(self)        
     
     def run(self):     
         #download files
@@ -21,9 +24,11 @@ class CAny(Thread,Module):
         #self._pairFinder.addSpecifiedExtensions([".exe",".dll"]) # better even without this cos there can be files like in MS14-028
         #self.pairFinder.addSpecifiedFiles(["mshtml.dll"])
         self.pairFinder.collectFiles(self._newDir,self._oldDir)
-        pairs = self.pairFinder.getPairs()
-        for pair in pairs:
-            newIDB = self._binDiffer.createIDB(pair["new"]["path"])
-            oldIDB = self._binDiffer.createIDB(pair["old"]["path"])
-            #run BinDiff
-            self._binDiffer.runBinDiff(newIDB,oldIDB)
+        self._sendFileList( self.pairFinder.getFiles() )
+        if self._task["mode"] == "auto":
+            pairs = self.pairFinder.getPairs()
+            for pair in pairs:
+                newIDB = self._binDiffer.createIDB(pair["new"]["path"])
+                oldIDB = self._binDiffer.createIDB(pair["old"]["path"])
+                #run BinDiff
+                self._binDiffer.runBinDiff(newIDB,oldIDB)

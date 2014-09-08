@@ -44,6 +44,10 @@ class PairFinder(object):
             return self.__pairs
         return self.__findPairs()
 
+    def getFiles(self):
+        return {"new": self.__newFilesList,"old": self.__oldFilesList}
+        
+
     def __compare(self,newFile,oldFile):
         """
             Returns True if file are the same and False in other way.

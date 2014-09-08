@@ -10,11 +10,15 @@ class Unpacker(object):
                            ".msu":self.__msuHandler,
                            ".zip":self.__zipHandler,
                            ".msp":self.__mspHandler,
-                           ".exe":self.__exeHandler
+                           ".exe":self.__exeHandler,
+                           ".cab":self.__cabHandler
                            }
 
-    def unpack(self,filePath,extractDir):
-        name,ext = os.path.splitext(filePath)
+    def unpack(self,filePath,extractDir,type = "auto"):
+        if type == "auto":
+            name,ext = os.path.splitext(filePath)
+        else:
+            ext = type
         self.__handlers[ext](filePath,extractDir)
 
     def __msiHandler(self,filePath,targetDir):
@@ -71,7 +75,7 @@ class Unpacker(object):
         ext  - Append appropriate extensions to output files.
         """
         msiXPath = os.path.join(Config.AGENT_LOCATION,"bin","MsiX.exe")
-        if subprocess.call([msiXPath, filePath, "/out",targetDir]) != 0:
+        if subprocess.call([msiXPath, filePath, "/out",extractDir]) != 0:
                     print "Could not unpack msu"
                     return False
         
@@ -80,7 +84,15 @@ class Unpacker(object):
         return True
 
     def __exeHandler(self,filePath,extractDir):
-        if subprocess.call([filePath, "/quiet", "/extract:", targetDir]) != 0:
-            print "Could not unpack cab"
+        if subprocess.call([filePath,"/quiet","/extract:" + extractDir]) != 0:
+            print "Could not unpack exe"
             return False
         return True
+    
+    def __cabHandler(self,filePath,extractDir):
+        print "Expanding", filePath, "to", targetDir
+
+        if subprocess.call(['expand', '-F:*', filePath, extractDir]) != 0:
+            print "Could not unpack cab"
+            return False
+        return True        
