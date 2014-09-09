@@ -90,7 +90,7 @@ class Unpacker(object):
         return True
     
     def __cabHandler(self,filePath,extractDir):
-        print "Expanding", filePath, "to", targetDir
+        print "Expanding", filePath, "to", extractDir
 
         if subprocess.call(['expand', '-F:*', filePath, extractDir]) != 0:
             print "Could not unpack cab"
