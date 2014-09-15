@@ -1,9 +1,10 @@
 #include <MsgBoxConstants.au3>
-$old_db = "t:\projects\Cisco\Code\AutoDiff\samples\GDI\old\gdi32.idb"
-$bd_db = "t:\projects\Cisco\Code\AutoDiff\samples\GDI\gdi32_vs_gdi32.BinDiff"
+$old_db = "t:\tmp\gdi32\old\SP3QFE\gdi32.idb"
+$bd_db = "t:\tmp\gdi32\gdi32_vs_gdi32.BinDiff"
 $exit_script = "t:\projects\Cisco\Code\AutoDiff\AutoDiff\agent\IDAScripts\exit.py"
 
 WinWait("zynamics BinDiff 4.0.0")
+WinActivate("zynamics BinDiff 4.0.0")
 send("{ENTER}")
 WinWait("Select Database")
 sleep(1000)

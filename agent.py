@@ -5,13 +5,17 @@ import urllib
 import os
 import json
 from config import *
+
 from logger import *
 Logger.init(Logger.CONSOLE)
+Logger.setLogUrl("http://autodiff.localdomain.com:7777/Logger/addLog")
 
 from Lib.unpacker import Unpacker
 from Lib.pairFinder import PairFinder
+from Lib.bindiffer import Bindiffer
 from Modules.any import *
 from Modules.flash import *
+import traceback
 
 class CAgent(Thread):             
     def __init__(self):
@@ -22,7 +26,7 @@ class CAgent(Thread):
         #commands handlers
         self.__handlers = {
                             "getTask"    : self.__getTask,
-                            "diffFiles"  : self.__nop,
+                            "diffFiles"  : self.__diffFiles,
                             "diffStop"   : self.__nop,
                             "unpack"     : self.__unpack
                          }
@@ -62,11 +66,12 @@ class CAgent(Thread):
     """
         Handlers
     """
-    def __getTask(self,params):
+    def __getTask(self,task_name):
         task = []
         try:
+            Logger.remoteLog("Starting working on task : ===[[ %s ]]===" % task_name,task_name)
             data   = urllib.urlencode( {"agent_id": self.getAgentID(),
-                                        "task_name" : params
+                                        "task_name" : task_name
                                         } )
             result = urllib2.urlopen("%s/Task/getTaskByName" % Config.HOST, data).read()
             task = json.loads(result)
@@ -76,6 +81,7 @@ class CAgent(Thread):
             module.run()
         except Exception as e:
             print e.message
+            print traceback.print_exc()
 
     def __unpack(self,params):
         try:
@@ -115,6 +121,24 @@ class CAgent(Thread):
         except Exception as e:
             print e.message
 
+    def __diffFiles(self,id):               
+                data   = urllib.urlencode( {"id": id} )
+                result = urllib2.urlopen("%s/Diff/getDiff" % Config.HOST, data).read()                
+                diff = json.loads(result)        
+                Logger.remoteLog("Start diffing : %s" % diff["diff_name"],diff["task_name"])
+
+                binDiffer = Bindiffer(self.getTaskDir(diff["task_name"]))
+                Logger.remoteLog("Create first IDB for : %s" % diff["newID"]["filePath"],diff["task_name"])
+                newIDB = binDiffer.createIDB(diff["newID"]["filePath"])
+                Logger.remoteLog("Create second IDB for : %s" % diff["oldID"]["filePath"],diff["task_name"])
+                oldIDB = binDiffer.createIDB(diff["oldID"]["filePath"])
+                #run BinDiff
+                Logger.remoteLog("Run Zynamics BinDiff engine",diff["task_name"])
+                binDiffer.runBinDiff(newIDB,oldIDB)
+                result = binDiffer.getResult()
+                self.sendDiffResult(diff["task_name"],id,result);
+                Logger.remoteLog("Diffing is DONE",diff["task_name"])
+                                
     def __nop(self,params):
         pass
 
@@ -142,6 +166,17 @@ class CAgent(Thread):
         except Exception as e:    
             print e.message
     
+    def sendDiffResult(self,task_name,diff_id,result):
+        postData = {"id": diff_id,
+                    "result": result,
+                    "task_name" : task_name
+                    }
+        try:
+            postData = urllib.urlencode(postData)
+            urllib2.urlopen("%s/Diff/saveResults" % Config.HOST, postData)
+        except Exception as e:    
+            print e.message
+
 if __name__ == "__main__":
     Logger.log("Launching agent")
     agent = CAgent()

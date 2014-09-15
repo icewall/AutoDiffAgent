@@ -29,6 +29,7 @@
     <Compile Include="IDAScripts\run_binDiff.template">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Lib\autodiff.py" />
     <Compile Include="Lib\bindiffer.py" />
     <Compile Include="Lib\pairFinder.py" />
     <Compile Include="Lib\unpacker.py" />

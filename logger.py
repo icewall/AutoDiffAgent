@@ -1,5 +1,6 @@
 import win32console
-
+import urllib2
+import urllib
 #TODO add somewhere free console
 
 class Logger(object):
@@ -12,6 +13,7 @@ class Logger(object):
     FILE    =  1
     BOTH    =  2
     CMD     =  3
+    REMOTE  =  4
 
     def __init__(self):
         pass
@@ -28,6 +30,7 @@ class Logger(object):
         cls.__handler = cls.__handlers[type]
         cls.__cmdBuffer = None
         cls.__logFile = None
+        cls.__logUrl  = None
         pass
         
     @classmethod
@@ -35,6 +38,15 @@ class Logger(object):
         msg += "\n"
         cls.__handler(msg)
         pass
+    
+    @classmethod
+    def remoteLog(cls,msg,task_name):
+        msg += "\n"
+        if cls.__logUrl == None:
+            cls.__consoleHandler(msg)
+        else:
+            formData = urllib.urlencode({"data":msg, "task_name" : task_name})                
+            urllib2.urlopen(cls.__logUrl,formData)        
 
     @classmethod
     def setLoggerType(cls,type):
@@ -43,6 +55,9 @@ class Logger(object):
     @classmethod
     def setLogFile(cls,logFile):
         cls.__logFile = logFile
+    @classmethod
+    def setLogUrl(cls,url):
+        cls.__logUrl = url
 
     """
     Handlers

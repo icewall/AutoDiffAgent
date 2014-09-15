@@ -2,7 +2,6 @@ import os
 import re
 import hashlib
 from logger import Logger
-Logger.init(Logger.CONSOLE)
 
 class PairFinder(object):
     def __init__(self):

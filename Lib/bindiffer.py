@@ -1,6 +1,9 @@
 import subprocess
 import os
 from config import Config
+import sqlite3
+import win32file
+import pefile 
 
 class Bindiffer(object):
 
@@ -8,21 +11,33 @@ class Bindiffer(object):
         self.__newIDBPath = None
         self.__oldIDBPath = None
         self.__patchDir = patchDir
-        self.__initPaths()
-        self.__makeBinDiffScript()
+        self.__IDA_PATH = "" #depends on file arch it gonna change
+        self.__BINDIFF_PLUGIN = ""
+        self.__IDBEXT = ""        
+        self.__archFlag = False
+        self.__initPaths()        
 
     def createIDB(self,filePath):
-        subprocess.check_output([Config.IDA_PATH, '-B', '-A', filePath])
+        self.__setArch(filePath)
+        subprocess.check_output([self.__IDA_PATH, '-B', '-A', filePath])
         #replace extension
         path, ext = os.path.splitext(filePath)
-        return path + ".idb"
+        return path + self.__IDBEXT
 
     def runBinDiff(self,newIDB,oldIDB):
-        #create .binDiff file name
+        #create .binDiff file name        
         self.__initBinDiffFile(newIDB,oldIDB)
+        self.__makeBinDiffScript()
         self.__makeBinDiffAu3(oldIDB)
-        subprocess.call([Config.IDA_PATH, '-S"%s"' % (self.__scriptBinDiffPath), newIDB])
-
+        subprocess.call([self.__IDA_PATH, '-S"%s"' % (self.__scriptBinDiffPath), newIDB])
+    
+    def getResult(self):
+        db = sqlite3.connect(self.__binDiffFilePath)
+        db.row_factory = sqlite3.Row
+        result = db.execute("select count(*) as amount from function where similarity < 1.0 order by similarity").fetchall()
+        db.close()
+        result = result[0]
+        return result["amount"]
 
     """
         Helpers
@@ -54,7 +69,7 @@ class Bindiffer(object):
         with file(self.__scriptBinDiffPath,'w') as f:
             template = template.replace("***AUTOIT_PATH***",Config.AUTOIT_PATH)
             template = template.replace("***AUTOIT_SCRIPT***",self.__au3BinDiffPath)
-            template = template.replace("***BINDIFF_PLUGIN***",Config.BINDIFF_PLUGIN)
+            template = template.replace("***BINDIFF_PLUGIN***",self.__BINDIFF_PLUGIN)
             f.write(template)
     
     def __makeBinDiffAu3(self,oldIDB):
@@ -66,5 +81,25 @@ class Bindiffer(object):
             template = template.replace("***BD_DB***",self.__binDiffFilePath)
             template = template.replace("***EXIT_SCRIPT***",os.path.join(self.__idaScriptsPath,"exit.py"))
             f.write(template)
+
+    def __setArch(self,filePath):
+        if not self.__archFlag:
+            self.__archFlag = True
+        else:
+            return
+
+        pe = pefile.PE(filePath,fast_load = True)
+        if pe.OPTIONAL_HEADER.Magic == 0x20b: #PE+ (x64)
+            self.__IDA_PATH = Config.IDA_PATH.replace("idaq.exe","idaq64.exe")
+            self.__BINDIFF_PLUGIN = Config.BINDIFF_PLUGIN.replace("zynamics_bindiff_4_0.plw","zynamics_bindiff_4_0.p64")
+            self.__IDBEXT = ".i64"
+        else:
+            #PE (x86)
+            self.__IDA_PATH = Config.IDA_PATH
+            self.__BINDIFF_PLUGIN = Config.BINDIFF_PLUGIN
+            self.__IDBEXT = ".idb"
+
+       
+
 
                 

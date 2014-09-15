@@ -4,6 +4,7 @@ $bd_db = "***BD_DB***"
 $exit_script = "***EXIT_SCRIPT***"
 
 WinWait("zynamics BinDiff 4.0.0")
+WinActivate("zynamics BinDiff 4.0.0")
 send("{ENTER}")
 WinWait("Select Database")
 sleep(1000)

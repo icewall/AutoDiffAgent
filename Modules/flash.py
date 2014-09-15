@@ -5,8 +5,6 @@ from logger import Logger
 import os
 import win32api
 
-Logger.init(Logger.CONSOLE)
-
 class CFlash(Thread,Module):
 
     def run(self):
