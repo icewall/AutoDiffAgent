@@ -10,6 +10,7 @@ class Bindiffer(object):
     def __init__(self,patchDir):
         self.__newIDBPath = None
         self.__oldIDBPath = None
+        self.__binDiffFilePath = None
         self.__patchDir = patchDir
         self.__IDA_PATH = "" #depends on file arch it gonna change
         self.__BINDIFF_PLUGIN = ""
@@ -38,6 +39,9 @@ class Bindiffer(object):
         db.close()
         result = result[0]
         return result["amount"]
+
+    def getBinDiffFilePath(self):
+        return self.__binDiffFilePath
 
     """
         Helpers

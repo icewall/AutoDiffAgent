@@ -13,6 +13,7 @@ Logger.setLogUrl("http://autodiff.localdomain.com:7777/Logger/addLog")
 from Lib.unpacker import Unpacker
 from Lib.pairFinder import PairFinder
 from Lib.bindiffer import Bindiffer
+from Lib.autodiff import AutoDiff
 from Modules.any import *
 from Modules.flash import *
 import traceback
@@ -137,6 +138,10 @@ class CAgent(Thread):
                 binDiffer.runBinDiff(newIDB,oldIDB)
                 result = binDiffer.getResult()
                 self.sendDiffResult(diff["task_name"],id,result);
+                #Logger.remoteLog("Run AutoDiff.py engine",diff["task_name"])
+                #autoDiffEngine = AutoDiff()
+                #autoDiffEngine.run(newIDB,oldIDB,binDiffer.getBinDiffFilePath())
+                #self.sendDiffResult(diff["task_name"],id,result);
                 Logger.remoteLog("Diffing is DONE",diff["task_name"])
                                 
     def __nop(self,params):

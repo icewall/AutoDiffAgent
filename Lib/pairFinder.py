@@ -24,6 +24,10 @@ class PairFinder(object):
             raise Exception("Extensions need to be passed as list type")
 
     def collectFiles(self,newFiles,oldFiles):
+        self.__pairs = []
+        self.__newFilesList = []
+        self.__oldFilesList = []
+
         for root, dirs, files in os.walk(newFiles):
             for f in files:
                 self.__newFilesList.append( os.path.join(root,f) )
